@@ -1,5 +1,6 @@
 package com.example.tripplanner.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -15,12 +16,13 @@ public class TripDestination {
     )
     private Long id;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "trip_id", nullable = false)
     private Trip trip;
 
     @ManyToOne
-    @JoinColumn(name = "destination_id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "destination_id", nullable = false)
     private Destination destination;
 
     @Column(nullable = false)

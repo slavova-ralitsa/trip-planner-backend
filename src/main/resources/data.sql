@@ -45,14 +45,14 @@ VALUES
 
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO app_users (id,email,password)
+INSERT INTO app_users (id, name, username, email, birthday, password)
 VALUES
-    (1,'ralica_s@gmail.com','$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
-    (2,'ivan_g@gmail.com', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
-    (3,'ivailo_k@gmail.com', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
-    (4,'maria_p@gmail.com', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
-    (5,'vili_l@gmail.com', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
-    (6,'cveti_t@gmail.com', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a')
+    (1, 'Ralica Petrova', 'ralica_p', 'ralica_s@gmail.com', '2000-01-15', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
+    (2, 'Ivan Georgiev', 'ivan_g', 'ivan_g@gmail.com', '1995-05-20', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
+    (3, 'Ivailo Kolev', 'ivailo_k', 'ivailo_k@gmail.com', '1988-11-02', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
+    (4, 'Maria Popova', 'maria_p', 'maria_p@gmail.com', '1993-08-24', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
+    (5, 'Vili Lazarova', 'vili_l', 'vili_l@gmail.com', '1999-04-12', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
+    (6, 'Cveti Todorova', 'cveti_t', 'cveti_t@gmail.com', '2002-12-30', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO trip (id, user_id, name, start_date, end_date,created_date)
@@ -131,8 +131,12 @@ VALUES
     (7,6, 7)
 ON CONFLICT (id) DO NOTHING;
 
-
-
+SELECT setval('destination_sequence',    100);
+SELECT setval('user_sequence',           100);
+SELECT setval('trip_sequence',           100);
+SELECT setval('trip_destination_sequence', 100);
+SELECT setval('user_favourite_sequence',  100);
+SELECT setval('app_users_id_seq',  100);
 
 
 

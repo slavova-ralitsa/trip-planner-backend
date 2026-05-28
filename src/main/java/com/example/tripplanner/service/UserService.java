@@ -71,6 +71,7 @@ public class UserService {
         String email = dto.getEmail();
         String password = dto.getPassword();
 
+
         Optional<User> existingUser = userRepository.findByEmail(email);
 
         if(existingUser.isPresent())
@@ -82,6 +83,9 @@ public class UserService {
         User user = new User();
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setName(dto.getName());
+        user.setUsername(dto.getUsername());
+        user.setBirthday(dto.getBirthday());
 
         return userRepository.save(user);
     }

@@ -1,6 +1,7 @@
 package com.example.tripplanner.repository;
 
 import com.example.tripplanner.entity.Trip;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -16,4 +17,6 @@ public interface TripRepository extends JpaRepository<Trip,Long> {
     Optional<Trip> findByStartDate(LocalDate startDate);
 
     Optional<Trip> findByCreatedDate(LocalDate createdDate);
+
+
 }

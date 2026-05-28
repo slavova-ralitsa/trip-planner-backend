@@ -63,7 +63,7 @@ public class DestinationService {
         }
     }
 
-    public List<Destination> findAll() {
+    public List<Destination> getAllDestinations() {
         return destinationRepository.findAll();
     }
 }

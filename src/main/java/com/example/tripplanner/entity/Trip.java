@@ -3,6 +3,7 @@ package com.example.tripplanner.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -34,7 +35,8 @@ public class Trip {
     @Column
     private LocalDate createdDate;
 
-    @OneToMany(mappedBy = "trip")
+    @JsonManagedReference
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL)
     private List<TripDestination> tripDestinations;
 
     public Trip() {}

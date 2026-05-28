@@ -1,5 +1,8 @@
 package com.example.tripplanner.service;
 
+import com.example.tripplanner.dto.DestinationDTO;
+import com.example.tripplanner.dto.TripDTO;
+import com.example.tripplanner.dto.TripDestinationDTO;
 import com.example.tripplanner.entity.Destination;
 import com.example.tripplanner.entity.Trip;
 import com.example.tripplanner.entity.TripDestination;
@@ -12,11 +15,13 @@ import com.example.tripplanner.repository.TripRepository;
 import com.example.tripplanner.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TripService {
@@ -29,6 +34,45 @@ public class TripService {
         this.tripRepository = tripRepository;
         this.destinationRepository = destinationRepository;
         this.userRepository = userRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<TripDTO> getUserTrips(Long userId) {
+        List<Trip> trips = tripRepository.findByUserId(userId);
+
+        return trips.stream()
+                .map(this::convertToTripDTO)
+                .collect(Collectors.toList());
+    }
+
+    private TripDTO convertToTripDTO(Trip trip) {
+        List<TripDestinationDTO> destinationDTOs = trip.getTripDestinations().stream()
+                .map(td -> new TripDestinationDTO(
+                        td.getDayIndex(),
+                        convertToDestinationDTO(td.getDestination()) // Извикваме новия помощен метод!
+                ))
+                .toList();
+
+        return new TripDTO(
+                trip.getId(),
+                trip.getName(),
+                trip.getStartDate(),
+                trip.getEndDate(),
+                destinationDTOs
+        );
+    }
+
+    private DestinationDTO convertToDestinationDTO(Destination dest) {
+        return new DestinationDTO(
+                dest.getId(),
+                dest.getName(),
+                dest.getCity(),
+                dest.getCountry(),
+                dest.getLatitude(),
+                dest.getLongitude(),
+                dest.getDescription(),
+                dest.getRating()
+        );
     }
 
     public static double calculateDistanceByHaversineFormula(Destination first, Destination second) {
@@ -88,11 +132,14 @@ public class TripService {
         return destinations;
     }
 
-    public Trip createTrip(Long userId, String tripName, LocalDate startDate, LocalDate endDate, List<Long> destinationIds) {
+    @Transactional
+    public TripDTO createTrip(Long userId, String tripName, LocalDate startDate, LocalDate endDate, List<Long> destinationIds) {
+
         User user = userRepository.findById(userId)
-                        .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
         if (endDate.isBefore(startDate)) {
-            throw new RuntimeException("End date cannot be before start date!");
+            throw new IllegalArgumentException("End date cannot be before start date!");
         }
 
         Trip trip = new Trip();
@@ -104,7 +151,8 @@ public class TripService {
 
         List<Destination> destinations = sortDestinations(transformListOfIdsToListOfDestinations(destinationIds));
         List<TripDestination> tripDestinations = new ArrayList<>();
-        for(int i = 0; i < destinations.size(); i++) {
+
+        for (int i = 0; i < destinations.size(); i++) {
             TripDestination tripDestination = new TripDestination();
             tripDestination.setTrip(trip);
             tripDestination.setDestination(destinations.get(i));
@@ -114,21 +162,38 @@ public class TripService {
         }
 
         trip.setTripDestinations(tripDestinations);
-        return tripRepository.save(trip);
+
+        Trip savedTrip = tripRepository.save(trip);
+
+        return convertToTripDTO(savedTrip);
     }
 
-    public List<Trip> getTripByUserId(Long userId) {
-        return tripRepository.findByUserId(userId);
+    @Transactional
+    public TripDTO updateTrip(Long id, Trip trip) {
+        Trip existingTrip = tripRepository.findById(id)
+                .orElseThrow(() -> new TripNotFoundException(id));
+        if(trip.getName() != null && !trip.getName().isBlank()) {
+            existingTrip.setName(trip.getName());
+        }
+        if(trip.getStartDate().isBefore(trip.getEndDate())) {
+            existingTrip.setStartDate(trip.getStartDate());
+            existingTrip.setEndDate(trip.getEndDate());
+        }
+        return convertToTripDTO(tripRepository.save(existingTrip));
     }
 
-    public Trip getTripByTripID(Long userId, Long tripId) {
-        return tripRepository.findByIdAndUserId(userId, tripId)
-                    .orElseThrow(() -> new TripNotFoundException(tripId));
+    @Transactional
+    public TripDTO getTripByTripID(Long userId, Long tripId) {
+        Trip trip = tripRepository.findByIdAndUserId(tripId, userId)
+                .orElseThrow(() -> new TripNotFoundException(tripId));
+
+        return convertToTripDTO(trip);
     }
 
+    @Transactional
     public void removeTrip(Long userId, Long tripId) {
-        Trip trip = tripRepository.findByIdAndUserId(userId, tripId)
-                        .orElseThrow(() -> new TripNotFoundException(tripId));
+        Trip trip = tripRepository.findByIdAndUserId(tripId, userId)
+                .orElseThrow(() -> new TripNotFoundException(tripId));
 
         tripRepository.delete(trip);
     }

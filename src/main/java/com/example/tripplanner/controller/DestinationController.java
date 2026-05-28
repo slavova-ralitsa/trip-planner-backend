@@ -56,4 +56,8 @@ public class DestinationController {
         return destinationService.getDestinationsByCountry(country);
     }
 
+    @GetMapping
+    public List<Destination> getAllDestinations() {
+        return destinationService.getAllDestinations();
+    }
 }

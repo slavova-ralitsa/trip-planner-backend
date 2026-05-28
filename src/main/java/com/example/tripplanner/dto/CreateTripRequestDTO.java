@@ -3,7 +3,7 @@ package com.example.tripplanner.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-public class CreateTripDTO {
+public class CreateTripRequestDTO {
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;

@@ -1,4 +1,6 @@
 package com.example.tripplanner.dto;
 
-public class TripDestinationDTO {
-}
+public record TripDestinationDTO(
+        Integer dayIndex,
+        DestinationDTO destination
+) {}
