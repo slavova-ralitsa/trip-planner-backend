@@ -59,9 +59,18 @@ public class TripController {
     }
 
     @Transactional
-    @PutMapping("/{id}")
-    public TripDTO updateTrip(@PathVariable Long id, @RequestBody Trip trip) {
-        return tripService.updateTrip(id, trip);
+    @PutMapping("/{tripId}")
+    public ResponseEntity<TripDTO> updateTrip(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long tripId, @RequestBody CreateTripRequestDTO request) {
+        Long userId = resolveUserId(userDetails);
+        tripService.getTripByTripID(userId, tripId);
+
+        TripDTO updated = tripService.updateTrip(tripId,
+                request.getName(),
+                request.getStartDate(),
+                request.getEndDate(),
+                request.getDestinationIds()
+        );
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")

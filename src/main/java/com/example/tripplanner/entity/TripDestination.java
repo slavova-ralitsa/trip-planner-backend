@@ -8,12 +8,7 @@ import jakarta.persistence.*;
 public class TripDestination {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "trip_destination_seq")
-    @SequenceGenerator(
-            name = "trip_destination_seq",
-            sequenceName = "trip_destination_sequence",
-            allocationSize = 50
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonBackReference

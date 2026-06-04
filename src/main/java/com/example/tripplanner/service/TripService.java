@@ -36,7 +36,7 @@ public class TripService {
         this.userRepository = userRepository;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<TripDTO> getUserTrips(Long userId) {
         List<Trip> trips = tripRepository.findByUserId(userId);
 
@@ -120,9 +120,11 @@ public class TripService {
     }
 
     protected List<Destination> transformListOfIdsToListOfDestinations(List<Long> destinationIds) {
+        if (destinationIds == null || destinationIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<Destination> destinations = new ArrayList<>();
-        if(destinationIds.isEmpty())
-            return destinations;
 
         for(long id : destinationIds) {
             Destination destination = destinationRepository.findById(id)
@@ -169,17 +171,43 @@ public class TripService {
     }
 
     @Transactional
-    public TripDTO updateTrip(Long id, Trip trip) {
-        Trip existingTrip = tripRepository.findById(id)
-                .orElseThrow(() -> new TripNotFoundException(id));
-        if(trip.getName() != null && !trip.getName().isBlank()) {
-            existingTrip.setName(trip.getName());
+    public TripDTO updateTrip(Long tripId, String name, LocalDate startDate, LocalDate endDate, List<Long> destinationIds) {
+        Trip existing = tripRepository.findById(tripId)
+                .orElseThrow(() -> new TripNotFoundException(tripId));
+
+        if (name != null && !name.isBlank())
+            existing.setName(name);
+
+        if (startDate != null && endDate != null && !endDate.isBefore(startDate)) {
+            existing.setStartDate(startDate);
+            existing.setEndDate(endDate);
         }
-        if(trip.getStartDate().isBefore(trip.getEndDate())) {
-            existingTrip.setStartDate(trip.getStartDate());
-            existingTrip.setEndDate(trip.getEndDate());
+
+        if (destinationIds != null && !destinationIds.isEmpty()) {
+            List<Destination> sorted = sortDestinations(
+                    transformListOfIdsToListOfDestinations(destinationIds));
+
+            List<TripDestination> existingDestinations = existing.getTripDestinations();
+
+            for (int i = 0; i < sorted.size(); i++) {
+                if (i < existingDestinations.size()) {
+                    existingDestinations.get(i).setDestination(sorted.get(i));
+                    existingDestinations.get(i).setDayIndex(i + 1);
+                } else {
+                    TripDestination td = new TripDestination();
+                    td.setTrip(existing);
+                    td.setDestination(sorted.get(i));
+                    td.setDayIndex(i + 1);
+                    existingDestinations.add(td);
+                }
+            }
+
+            if (existingDestinations.size() > sorted.size()) {
+                existingDestinations.subList(sorted.size(), existingDestinations.size()).clear();
+            }
         }
-        return convertToTripDTO(tripRepository.save(existingTrip));
+
+        return convertToTripDTO(tripRepository.save(existing));
     }
 
     @Transactional

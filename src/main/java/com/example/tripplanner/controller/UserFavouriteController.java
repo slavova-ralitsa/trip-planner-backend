@@ -1,7 +1,7 @@
 package com.example.tripplanner.controller;
 
-import com.example.tripplanner.entity.Destination;
-import com.example.tripplanner.entity.UserFavourite;
+import com.example.tripplanner.dto.TripDTO;
+import com.example.tripplanner.dto.UserFavouriteDTO;
 import com.example.tripplanner.service.UserFavouriteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,20 +20,21 @@ public class UserFavouriteController {
     }
 
     @GetMapping
-    public List<Destination> getFavourites(@PathVariable Long userId) {
-        return userFavouriteService.listFavourites(userId);
+    public ResponseEntity<List<TripDTO>> getFavourites(@PathVariable Long userId) {
+        List<TripDTO> favoriteDTOs = userFavouriteService.listFavourites(userId);
+        return ResponseEntity.ok(favoriteDTOs);
     }
 
-    @PostMapping("/{destinationId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserFavourite addFavourite(@PathVariable Long userId, @PathVariable Long destinationId) {
-        return userFavouriteService.addFavourite(userId, destinationId);
+    @PostMapping("/{tripId}")
+    public ResponseEntity<UserFavouriteDTO> addFavourite(@PathVariable Long userId, @PathVariable Long tripId) {
+        // Вече връщаме DTO вместо Entity, за да избегнем LazyInitializationException
+        UserFavouriteDTO savedFavourite = userFavouriteService.addFavourite(userId, tripId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedFavourite);
     }
 
-    @DeleteMapping("/{destinationId}")
-    public ResponseEntity<Void> removeFavourite(@PathVariable Long userId, @PathVariable Long destinationId) {
-        userFavouriteService.removeFavourite(userId, destinationId);
+    @DeleteMapping("/{tripId}")
+    public ResponseEntity<Void> removeFavourite(@PathVariable Long userId, @PathVariable Long tripId) {
+        userFavouriteService.removeFavourite(userId, tripId);
         return ResponseEntity.noContent().build();
     }
-
 }

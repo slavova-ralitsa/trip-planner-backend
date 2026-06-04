@@ -1,70 +1,101 @@
 package com.example.tripplanner.service;
 
-import com.example.tripplanner.entity.Destination;
+import com.example.tripplanner.dto.TripDTO;
+import com.example.tripplanner.dto.UserFavouriteDTO;
+import com.example.tripplanner.entity.Trip;
 import com.example.tripplanner.entity.User;
 import com.example.tripplanner.entity.UserFavourite;
-import com.example.tripplanner.exception.DestinationNotFoundException;
 import com.example.tripplanner.exception.FavouriteDestinationAlreadyExistsException;
 import com.example.tripplanner.exception.FavouriteDestinationNotFoundException;
+import com.example.tripplanner.exception.TripNotFoundException;
 import com.example.tripplanner.exception.UserNotFoundException;
-import com.example.tripplanner.repository.DestinationRepository;
+import com.example.tripplanner.repository.TripRepository;
 import com.example.tripplanner.repository.UserFavouriteRepository;
 import com.example.tripplanner.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserFavouriteService {
 
     private final UserFavouriteRepository userFavouriteRepository;
-
     private final UserRepository userRepository;
+    private final TripRepository tripRepository;
 
-    private final DestinationRepository destinationRepository;
-
-    public UserFavouriteService(UserFavouriteRepository userFavouriteRepository, UserRepository userRepository, DestinationRepository destinationRepository) {
+    public UserFavouriteService(UserFavouriteRepository userFavouriteRepository,
+                                UserRepository userRepository,
+                                TripRepository tripRepository) {
         this.userFavouriteRepository = userFavouriteRepository;
         this.userRepository = userRepository;
-        this.destinationRepository = destinationRepository;
+        this.tripRepository = tripRepository;
     }
 
-    public UserFavourite addFavourite(Long userId, Long destinationId) {
+    public UserFavouriteDTO addFavourite(Long userId, Long tripId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        Destination destination = destinationRepository.findById(destinationId)
-                .orElseThrow(() -> new DestinationNotFoundException(destinationId));
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new TripNotFoundException(tripId));
 
-        if(userFavouriteRepository.existsByUserIdAndDestinationId(userId, destinationId)) {
-            throw new FavouriteDestinationAlreadyExistsException (destinationId);
+        if (userFavouriteRepository.existsByUserIdAndTripId(userId, tripId)) {
+            UserFavourite existing = userFavouriteRepository.findByUserIdAndTripId(userId, tripId)
+                    .orElseThrow(() -> new FavouriteDestinationNotFoundException(tripId, userId));
+            return toDTO(existing);
         }
 
         UserFavourite userFavourite = new UserFavourite();
         userFavourite.setUser(user);
-        userFavourite.setDestination(destination);
+        userFavourite.setTrip(trip);
 
-        return userFavouriteRepository.save(userFavourite);
+        return toDTO(userFavouriteRepository.save(userFavourite));
     }
 
-    public void removeFavourite(Long userId, Long destinationId) {
-        if(!userFavouriteRepository.existsByUserIdAndDestinationId(userId, destinationId))
-            throw new FavouriteDestinationNotFoundException(destinationId, userId);
+    private UserFavouriteDTO toDTO(UserFavourite userFavourite) {
+        Trip trip = userFavourite.getTrip();
 
-        userFavouriteRepository.deleteByUserIdAndDestinationId(userId, destinationId);
+        TripDTO tripDTO = new TripDTO(
+                trip.getId(),
+                trip.getName(),
+                trip.getStartDate(),
+                trip.getEndDate(),
+                List.of()
+        );
+
+        UserFavouriteDTO dto = new UserFavouriteDTO();
+        dto.setId(userFavourite.getId());
+        dto.setUserId(userFavourite.getUser().getId());
+        dto.setTrip(tripDTO);
+        return dto;
     }
 
-    public List<Destination> listFavourites(Long userId) {
-        if (!userRepository.existsById(userId))
+    @Transactional
+    public void removeFavourite(Long userId, Long tripId) {
+        if (!userFavouriteRepository.existsByUserIdAndTripId(userId, tripId))
+            throw new FavouriteDestinationNotFoundException(tripId, userId);
+
+        userFavouriteRepository.deleteByUserIdAndTripId(userId, tripId);
+    }
+
+    public List<TripDTO> listFavourites(Long userId) {
+
+        if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
+        }
 
-        List<Destination> destinations = new ArrayList<>();
-        List<UserFavourite> userFavourites = userFavouriteRepository.findByUserId(userId);
-        for(UserFavourite userFavourite : userFavourites)
-            destinations.add(userFavourite.getDestination());
-        return destinations;
+        List<UserFavourite> userFavourites =
+                userFavouriteRepository.findByUserId(userId);
+
+        return userFavourites.stream()
+                .map(UserFavourite::getTrip)
+                .map(trip -> new TripDTO(
+                        trip.getId(),
+                        trip.getName(),
+                        trip.getStartDate(),
+                        trip.getEndDate(),
+                        List.of()
+                ))
+                .toList();
     }
-
-
 }

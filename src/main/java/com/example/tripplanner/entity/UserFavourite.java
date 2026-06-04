@@ -4,17 +4,11 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "user_favourites",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "destination_id"})})
-
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "trip_id"})})
 public class UserFavourite {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_favourite_seq")
-    @SequenceGenerator(
-            name = "user_favourite_seq",
-            sequenceName = "user_favourite_sequence",
-            allocationSize = 50
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -22,8 +16,8 @@ public class UserFavourite {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "destination_id", nullable = false)
-    private Destination destination;
+    @JoinColumn(name = "trip_id", nullable = false)
+    private Trip trip;
 
     public UserFavourite() {}
 
@@ -31,24 +25,23 @@ public class UserFavourite {
         return id;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public Destination getDestination() {
-        return destination;
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public void setUser(User user) {
         this.user = user;
     }
 
-    public void setDestination(Destination destination) {
-        this.destination = destination;
+    public Trip getTrip() {
+        return trip;
     }
 
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
 }

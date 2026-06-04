@@ -11,12 +11,7 @@ import jakarta.persistence.*;
 public class Trip {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "trip_seq")
-    @SequenceGenerator(
-            name = "trip_seq",
-            sequenceName = "trip_sequence",
-            allocationSize = 50
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -36,8 +31,11 @@ public class Trip {
     private LocalDate createdDate;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TripDestination> tripDestinations;
+
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.REMOVE)
+    private List<UserFavourite> userFavourites;
 
     public Trip() {}
 

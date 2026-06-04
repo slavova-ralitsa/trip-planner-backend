@@ -9,12 +9,7 @@ import jakarta.validation.constraints.NotNull;
 public class Destination {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "destination_seq")
-    @SequenceGenerator(
-            name = "destination_seq",
-            sequenceName = "destination_sequence",
-            allocationSize = 50
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
