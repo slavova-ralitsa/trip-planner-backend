@@ -1,8 +1,6 @@
 # Trip Planner Application
 
 **Made for the SAP Mentorship Program**
- 
-Work in Progress – This project is currently under development.
 
 ---
 
@@ -13,6 +11,7 @@ While still a work in progress, it demonstrates my skills in backend development
 
 The goal of this project is to challenge myself and dive into real-world technologies while following clean and structured coding practices.
 
+> AI was used minimally throughout this project — mainly as a learning aid to better understand concepts and technologies and to help debug issues.
 ---
 
 ## Features

@@ -116,7 +116,8 @@ VALUES
     ( 'Milford Sound', 'Fiordland', 'New Zealand', -44.6413, 167.8974, 'Dramatic fiord in Fiordland National Park with towering peaks and waterfalls.', 5.0),
     ( 'Hobbiton', 'Matamata', 'New Zealand', -37.8572, 175.6822, 'Real-life movie set from The Lord of the Rings films set in rolling green hills.', 4.7),
     ( 'Tongariro Alpine Crossing', 'Ruapehu', 'New Zealand', -39.1561, 175.5927, 'World-class one-day hike across volcanic craters, emerald lakes, and ancient lava flows.', 4.9),
-    ( 'Abel Tasman National Park', 'Nelson', 'New Zealand', -40.8912, 172.9972, 'Stunning coastal park with golden beaches, turquoise sea, and native forest.', 4.9);
+    ( 'Abel Tasman National Park', 'Nelson', 'New Zealand', -40.8912, 172.9972, 'Stunning coastal park with golden beaches, turquoise sea, and native forest.', 4.9)
+ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO app_users (name, username, email, birthday, password)
 VALUES
@@ -125,7 +126,8 @@ VALUES
     ( 'Ivailo Kolev', 'ivailo_k', 'ivailo_k@gmail.com', '1988-11-02', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
     ( 'Maria Popova', 'maria_p', 'maria_p@gmail.com', '1993-08-24', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
     ( 'Vili Lazarova', 'vili_l', 'vili_l@gmail.com', '1999-04-12', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a'),
-    ( 'Cveti Todorova', 'cveti_t', 'cveti_t@gmail.com', '2002-12-30', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a');
+    ( 'Cveti Todorova', 'cveti_t', 'cveti_t@gmail.com', '2002-12-30', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqQ3a')
+ON CONFLICT (username) DO NOTHING;
 
 INSERT INTO trip (user_id, name, start_date, end_date,created_date)
 VALUES
