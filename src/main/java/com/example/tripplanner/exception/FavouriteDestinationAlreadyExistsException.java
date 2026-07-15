@@ -7,7 +7,7 @@ public class FavouriteDestinationAlreadyExistsException extends RuntimeException
     private final ErrorCode errorCode;
 
     public FavouriteDestinationAlreadyExistsException(Long id) {
-        super("Favourite destination with id " + id + "already exists!");
+        super("Favourite destination with id " + id + " already exists!");
         this.errorCode = ErrorCode.FAVOURITE_DESTINATION_ALREADY_EXISTS;
     }
 

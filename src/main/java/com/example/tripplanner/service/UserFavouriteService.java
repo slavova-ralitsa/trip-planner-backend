@@ -40,9 +40,7 @@ public class UserFavouriteService {
                 .orElseThrow(() -> new TripNotFoundException(tripId));
 
         if (userFavouriteRepository.existsByUserIdAndTripId(userId, tripId)) {
-            UserFavourite existing = userFavouriteRepository.findByUserIdAndTripId(userId, tripId)
-                    .orElseThrow(() -> new FavouriteDestinationNotFoundException(tripId, userId));
-            return toDTO(existing);
+            throw new FavouriteDestinationAlreadyExistsException(tripId);
         }
 
         UserFavourite userFavourite = new UserFavourite();
