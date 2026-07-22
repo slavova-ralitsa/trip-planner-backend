@@ -22,7 +22,7 @@ public class UserRegistrationDTO {
     private LocalDate birthday;
 
     @NotBlank
-    @Size(min = 6, max = 25)
+    @Size(min = 6, max = 25, message = "Password must be at least 6 characters")
     private String password;
 
     @NotBlank

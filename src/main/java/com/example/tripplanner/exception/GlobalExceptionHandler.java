@@ -7,9 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
-
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -67,6 +68,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleTripNotFound(TripNotFoundException ex, HttpServletRequest request) {
         logger.warn("Trip not found: {}", ex.getMessage());
         return buildError(HttpStatus.NOT_FOUND, ex.getErrorCode(), ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDTO> handleValidationErrors(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        logger.warn("Validation failed: {}", message);
+        return buildError(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR, message, request);
     }
 
     @ExceptionHandler(Exception.class)
