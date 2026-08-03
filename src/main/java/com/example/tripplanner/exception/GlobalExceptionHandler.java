@@ -82,5 +82,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGenericException(Exception ex, HttpServletRequest request) {
         logger.error("Internal server error occurred", ex);
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.GENERIC_ERROR, ex.getMessage(), request);    }
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.GENERIC_ERROR, ex.getMessage(), request);
+    }
 }
