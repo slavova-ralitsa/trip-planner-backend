@@ -1,7 +1,5 @@
 package com.example.tripplanner.dto;
 
-import com.example.tripplanner.entity.Trip;
-
 public class UserFavouriteDTO {
     private Long id;
     private Long userId;
